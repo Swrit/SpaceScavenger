@@ -35,24 +35,13 @@ public class ShipBehaviour : MonoBehaviour, I_ObjectReset
     protected Health health;
 
     [SerializeField] private AudioClip deathSound;
+    private BoxCollider2D boxCollider;
 
     private void Awake()
     {
-        if (shipController == null) shipController = GetComponent<I_ShipControllerInterface>();
-
-        shipController.OnWeaponStart += ShipController_OnWeaponStart;
-        shipController.OnWeaponStop += ShipController_OnWeaponStop;
-
-        health = GetComponent<Health>();
-        health.OnHealthChange += Health_OnHealthChange;
-
-
-
         if (faceUp) faceDirection = Vector3.up;
 
         transform.up = faceDirection;
-
-        
     }
 
 
@@ -61,6 +50,16 @@ public class ShipBehaviour : MonoBehaviour, I_ObjectReset
     // Start is called before the first frame update
     void Start()
     {
+        boxCollider = GetComponent<BoxCollider2D>();
+
+        if (shipController == null) shipController = GetComponent<I_ShipControllerInterface>();
+
+        shipController.OnWeaponStart += ShipController_OnWeaponStart;
+        shipController.OnWeaponStop += ShipController_OnWeaponStop;
+
+        health = GetComponent<Health>();
+        health.OnHealthChange += Health_OnHealthChange;
+
         ResetObject();
     }
 
@@ -80,6 +79,12 @@ public class ShipBehaviour : MonoBehaviour, I_ObjectReset
         
 
         transform.position = newPosition;
+
+        if (PlayArea.Instance.IsOutsideActiveZone(boxCollider))
+        {
+            Debug.Log("Dispose outside active zone");
+            Dispose();
+        }
     }
 
     private void ShipController_OnWeaponStart(object sender, int e)
@@ -113,7 +118,11 @@ public class ShipBehaviour : MonoBehaviour, I_ObjectReset
         for (int i = 0; i < weaponSlots.Count; i++)
         {
             Debug.Log("Slot " + i + " weapon " + newWeapon);
-            if (weaponSlots[i].permanent) continue;
+            if (weaponSlots[i].permanent) 
+            {
+                weaponSlots[i].weapon.WeaponSetup(transform.up, entityType, this);
+                continue;
+            };
             GameObject weapon = ObjectPoolManager.Instance.RequestObject(newWeapon);
             if (weapon)
             {
@@ -170,10 +179,16 @@ public class ShipBehaviour : MonoBehaviour, I_ObjectReset
         clampMovementBox = box;
     }
 
+    protected void Dispose()
+    {
+        //Debug.Log(gameObject.GetInstanceID() + " dispose");
+        ObjectPoolManager.Instance.Deactivate(gameObject);
+    }
+
     private void Die()
     {
         SoundManager.Instance.PlaySound(deathSound);
         GuiController.Instance.AddScore(pointsForKill);
-        ObjectPoolManager.Instance.Deactivate(this.gameObject);
+        Dispose();
     }
 }

@@ -27,9 +27,10 @@ public abstract class WeaponBase : MonoBehaviour
         if (pickup != null) pickup.enabled = true;
         ownerShip.DropWeapon(this);
         ownerShip = null;
+        WeaponStop();
     }
 
-    public void WeaponSetup(Vector3 direction, EntityType entityType, ShipBehaviour shipBehaviour)
+    public virtual void WeaponSetup(Vector3 direction, EntityType entityType, ShipBehaviour shipBehaviour)
     {
         transform.up = direction;
         ownerType = entityType;

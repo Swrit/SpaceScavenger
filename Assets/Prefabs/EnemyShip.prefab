@@ -207,7 +207,7 @@ MonoBehaviour:
   - {fileID: 8519906675916453204, guid: 8f94fe06c00b58f43abaac46edf8f4ba, type: 3}
   faceUp: 0
   strafeSpeed: 128
-  pointsForKill: 100
+  pointsForKill: 500
   deathSound: {fileID: 8300000, guid: 55734795d190492468610df67d32e2d7, type: 3}
 --- !u!114 &1071113607933525583
 MonoBehaviour:

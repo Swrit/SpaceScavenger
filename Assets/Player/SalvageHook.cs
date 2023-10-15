@@ -82,6 +82,11 @@ public class SalvageHook : WeaponBase, I_ObjectReset
         UpdateChain();
     }
 
+    public override void WeaponSetup(Vector3 direction, EntityType entityType, ShipBehaviour shipBehaviour)
+    {
+        base.WeaponSetup(direction, entityType, shipBehaviour);
+        shootPoint = transform.parent;
+    }
 
     private void SwitchState(HookState newState)
     {
